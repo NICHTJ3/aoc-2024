@@ -1,50 +1,39 @@
+use itertools::Itertools;
 use std::collections::HashMap;
 
 advent_of_code::solution!(1);
 
+fn parse(input: &str) -> (Vec<u32>, Vec<u32>) {
+    input
+        .lines()
+        .map(|line| {
+            line.split_ascii_whitespace()
+                .map(|e| e.parse::<u32>().unwrap())
+                .collect_tuple()
+                .unwrap()
+        })
+        .unzip()
+}
+
 pub fn part_one(input: &str) -> Option<u32> {
-    // Initialize vectors
-    let mut list1: Vec<u32> = Vec::new();
-    let mut list2: Vec<u32> = Vec::new();
-    let mut distances: Vec<u32> = Vec::new();
+    let (left, right) = parse(input);
 
-    // Process each line
-    for line in input.lines() {
-        let values: Vec<&str> = line.split("   ").collect();
-        if let (Some(&col1), Some(&col2)) = (values.first(), values.get(1)) {
-            list1.push(col1.parse::<u32>().unwrap()); // Add first column to list1
-            list2.push(col2.parse::<u32>().unwrap()); // Add second column to list2
-        }
-    }
+    let distance = left
+        .iter()
+        .sorted()
+        .zip(right.iter().sorted())
+        .map(|(a, b)| a.abs_diff(*b))
+        .sum();
 
-    list1.sort();
-    list2.sort();
-
-    for (item1, item2) in list1.into_iter().zip(list2.into_iter()).clone() {
-        let distance = item1.abs_diff(item2);
-        distances.push(distance)
-    }
-
-    Some(distances.iter().sum())
+    Some(distance)
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    // Initialize vectors
-    let mut list1: Vec<u32> = Vec::new();
-    let mut list2: Vec<u32> = Vec::new();
+    let (left, right) = parse(input);
+
     let mut scores: HashMap<u32, u32> = HashMap::new();
-
-    // Process each line
-    for line in input.lines() {
-        let values: Vec<&str> = line.split("   ").collect();
-        if let (Some(&col1), Some(&col2)) = (values.first(), values.get(1)) {
-            list1.push(col1.parse::<u32>().unwrap()); // Add first column to list1
-            list2.push(col2.parse::<u32>().unwrap()); // Add second column to list2
-        }
-    }
-
-    for item1 in &list1 {
-        for item2 in &list2 {
+    for item1 in &left {
+        for item2 in &right {
             if item1 == item2 {
                 scores
                     .entry(*item1)
@@ -54,12 +43,9 @@ pub fn part_two(input: &str) -> Option<u32> {
         }
     }
 
-    let mut values: Vec<u32> = Vec::new();
-    for (item, occurances) in &scores {
-        values.push(item * occurances);
-    }
+    let similarities = scores.iter().map(|(item, occurances)| item * occurances);
 
-    Some(values.iter().sum())
+    Some(similarities.sum())
 }
 
 #[cfg(test)]
