@@ -16,12 +16,12 @@ fn parse(input: &str) -> (Vec<u32>, Vec<u32>) {
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let (left, right) = parse(input);
+    let (left_side, right_side) = parse(input);
 
-    let distance = left
+    let distance = left_side
         .iter()
         .sorted()
-        .zip(right.iter().sorted())
+        .zip(right_side.iter().sorted())
         .map(|(a, b)| a.abs_diff(*b))
         .sum();
 
@@ -29,15 +29,15 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let (left, right) = parse(input);
+    let (left_side, right_side) = parse(input);
 
     let mut scores: HashMap<u32, u32> = HashMap::new();
-    for item1 in &left {
-        for item2 in &right {
-            if item1 == item2 {
+    for a in &left_side {
+        for b in &right_side {
+            if a == b {
                 scores
-                    .entry(*item1)
-                    .and_modify(|item| *item += 1)
+                    .entry(*a)
+                    .and_modify(|score| *score += 1)
                     .or_insert(1);
             }
         }
