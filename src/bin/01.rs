@@ -18,12 +18,12 @@ fn parse(input: &str) -> (Vec<u32>, Vec<u32>) {
 pub fn part_one(input: &str) -> Option<u32> {
     let (left_side, right_side) = parse(input);
 
-    let distance = left_side
-        .iter()
-        .sorted()
-        .zip(right_side.iter().sorted())
-        .map(|(a, b)| a.abs_diff(*b))
-        .sum();
+    let distance = std::iter::zip(
+        left_side.into_iter().sorted(),
+        right_side.into_iter().sorted(),
+    )
+    .map(|(a, b)| a.abs_diff(b))
+    .sum();
 
     Some(distance)
 }
