@@ -1,75 +1,60 @@
+use itertools::Itertools;
+use std::cmp::Ordering;
+
 advent_of_code::solution!(2);
 
-fn sequence_is_valid(items: Vec<i32>) -> bool {
-    if items.len() < 2 {
-        return true;
+fn is_safe(items: &[usize]) -> usize {
+    let mut ordering = Ordering::Equal;
+
+    for (a, b) in items.iter().tuple_windows() {
+        let current_ordering = a.cmp(b);
+
+        ordering = ordering.then(current_ordering);
+
+        if !(current_ordering == ordering && (1..=3).contains(&a.abs_diff(*b))) {
+            return 0;
+        }
     }
 
-    let mut stack = vec![items[0]];
-    let mut direction: Option<bool> = None;
-
-    for &num in &items[1..] {
-        let top = stack.last().unwrap();
-
-        let gap = (num - top).abs();
-
-        if !(1..=3).contains(&gap) {
-            return false;
-        }
-
-        if direction.is_none() {
-            direction = Some(num > *top);
-        } else if (direction == Some(true) && num <= *top)
-            || (direction == Some(false) && num >= *top)
-        {
-            return false;
-        }
-
-        stack.push(num);
-    }
-
-    true
+    1
 }
 
 pub fn part_one(input: &str) -> Option<usize> {
     let sequences = input.lines().map(|line| {
-        let items: Vec<i32> = line
+        let items: Vec<usize> = line
             .split_whitespace()
-            .map(|e| e.parse::<i32>())
-            .map(Result::unwrap)
+            .map(|e| e.parse::<usize>().unwrap())
             .collect();
 
-        sequence_is_valid(items)
+        is_safe(&items)
     });
 
-    Some(sequences.filter(|item| *item).count())
+    Some(sequences.sum())
 }
 
 pub fn part_two(input: &str) -> Option<usize> {
     let sequences = input.lines().map(|line| {
-        let items: Vec<i32> = line
+        let items: Vec<usize> = line
             .split_whitespace()
-            .map(|e| e.parse::<i32>())
-            .map(Result::unwrap)
+            .map(|e| e.parse::<usize>().unwrap())
             .collect();
 
-        if sequence_is_valid(items.clone()) {
-            return true;
+        if is_safe(&items) == 1 {
+            return 1;
         }
 
-        for i in 0..items.len() {
-            let mut reduced_sequence = items.to_vec();
-            reduced_sequence.remove(i); // Remove one element.
-            if sequence_is_valid(reduced_sequence) {
-                return true;
-            }
+        if (0..items.len()).any(|i| {
+            let mut y = items.clone();
+            y.remove(i);
+            is_safe(&y) == 1
+        }) {
+            return 1;
         }
-        false
+        0
     });
 
-    Some(sequences.filter(|item| *item).count())
+    Some(sequences.sum())
 }
-
 
 #[cfg(test)]
 mod tests {
