@@ -1,6 +1,7 @@
 advent_of_code::solution!(4);
 
 type Point<T = i32> = (T, T);
+
 const NORTH: Point = (-1, 0);
 const SOUTH: Point = (1, 0);
 const EAST: Point = (0, 1);
