@@ -20,39 +20,33 @@ fn is_solvable(remainder: i64, terms: &[i64], allow_concat: bool) -> bool {
 }
 
 pub fn part_one(input: &str) -> Option<i64> {
-    Some(
-        input
-            .lines()
-            .map(|l| l.split_once(": ").unwrap())
-            .filter_map(|(target_string, terms_string)| {
-                let target = target_string.parse().unwrap();
-                let terms = terms_string
-                    .split_whitespace()
-                    .map(|s| s.parse().unwrap())
-                    .collect_vec();
+    Some(input.lines().fold(0, |acc, l| {
+        let (target_string, terms_string) = l.split_once(": ").unwrap();
+        let target = target_string.parse().unwrap();
+        let terms = terms_string
+            .split_whitespace()
+            .map(|s| s.parse().unwrap())
+            .collect_vec();
 
-                is_solvable(target, &terms, false).then_some(target)
-            })
-            .sum(),
-    )
+        acc + is_solvable(target, &terms, false)
+            .then_some(target)
+            .unwrap_or_default()
+    }))
 }
 
 pub fn part_two(input: &str) -> Option<i64> {
-    Some(
-        input
-            .lines()
-            .map(|l| l.split_once(": ").unwrap())
-            .filter_map(|(target_string, terms_string)| {
-                let target = target_string.parse().unwrap();
-                let terms = terms_string
-                    .split_whitespace()
-                    .map(|s| s.parse().unwrap())
-                    .collect_vec();
+    Some(input.lines().fold(0, |acc, l| {
+        let (target_string, terms_string) = l.split_once(": ").unwrap();
+        let target = target_string.parse().unwrap();
+        let terms = terms_string
+            .split_whitespace()
+            .map(|s| s.parse().unwrap())
+            .collect_vec();
 
-                is_solvable(target, &terms, true).then_some(target)
-            })
-            .sum(),
-    )
+        acc + is_solvable(target, &terms, true)
+            .then_some(target)
+            .unwrap_or_default()
+    }))
 }
 
 #[cfg(test)]
