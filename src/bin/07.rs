@@ -28,9 +28,10 @@ pub fn part_one(input: &str) -> Option<i64> {
             .map(|s| s.parse().unwrap())
             .collect_vec();
 
-        acc + is_solvable(target, &terms, false)
-            .then_some(target)
-            .unwrap_or_default()
+        if is_solvable(target, &terms, false) {
+            return acc + target;
+        }
+        acc
     }))
 }
 
@@ -43,9 +44,10 @@ pub fn part_two(input: &str) -> Option<i64> {
             .map(|s| s.parse().unwrap())
             .collect_vec();
 
-        acc + is_solvable(target, &terms, true)
-            .then_some(target)
-            .unwrap_or_default()
+        if is_solvable(target, &terms, true) {
+            return acc + target;
+        }
+        acc
     }))
 }
 
