@@ -1,4 +1,33 @@
+use itertools::Itertools;
+
 advent_of_code::solution!(5);
+
+fn parse_ordering_rules(ordering_rules_input: &str) -> Vec<Vec<bool>> {
+    let ordering_rules =
+        ordering_rules_input
+            .lines()
+            .fold(vec![vec![false; 100]; 100], |mut rules, line| {
+                let (before, after) = line
+                    .split_once('|')
+                    .map(|(before, after)| {
+                        (
+                            before.parse::<usize>().unwrap(),
+                            after.parse::<usize>().unwrap(),
+                        )
+                    })
+                    .unwrap();
+
+                rules[before][after] = true;
+                rules
+            });
+    ordering_rules
+}
+
+fn parse_pages_line(line: &str) -> Vec<i32> {
+    line.split(',')
+        .map(|val| val.trim().parse().unwrap())
+        .collect_vec()
+}
 
 fn adheres_to_rules(values: &[i32], rules: &[Vec<bool>]) -> bool {
     values
@@ -7,30 +36,15 @@ fn adheres_to_rules(values: &[i32], rules: &[Vec<bool>]) -> bool {
 }
 
 pub fn part_one(input: &str) -> Option<i32> {
-    let mut parts = input.split("\n\n");
+    let (ordering_rules_input, values_input) = input.split_once("\n\n").unwrap();
 
-    let ordering_rules =
-        parts
-            .next()
-            .unwrap()
-            .lines()
-            .fold(vec![vec![false; 100]; 100], |mut rules, line| {
-                let rule_parts: Vec<usize> = line
-                    .split('|')
-                    .map(|part| part.trim().parse::<usize>().unwrap())
-                    .collect();
+    let ordering_rules = parse_ordering_rules(ordering_rules_input);
 
-                rules[rule_parts[0]][rule_parts[1]] = true;
-                rules
-            });
+    let result = values_input.lines().fold(0, |mut result, line| {
+        let page_order = parse_pages_line(line);
 
-    let result = parts.next().unwrap().lines().fold(0, |mut result, line| {
-        let values: Vec<i32> = line
-            .split(',')
-            .map(|val| val.trim().parse().unwrap())
-            .collect();
-        if adheres_to_rules(&values, &ordering_rules) {
-            result += values.get(values.len() / 2).unwrap();
+        if adheres_to_rules(&page_order, &ordering_rules) {
+            result += page_order.get(page_order.len() / 2).unwrap();
         }
         result
     });
@@ -39,34 +53,18 @@ pub fn part_one(input: &str) -> Option<i32> {
 }
 
 pub fn part_two(input: &str) -> Option<i32> {
-    let mut parts = input.split("\n\n");
+    let (ordering_rules_input, values_input) = input.split_once("\n\n").unwrap();
 
-    let ordering_rules =
-        parts
-            .next()
-            .unwrap()
-            .lines()
-            .fold(vec![vec![false; 100]; 100], |mut rules, line| {
-                let rule_parts: Vec<usize> = line
-                    .split('|')
-                    .map(|part| part.trim().parse::<usize>().unwrap())
-                    .collect();
+    let ordering_rules = parse_ordering_rules(ordering_rules_input);
 
-                rules[rule_parts[0]][rule_parts[1]] = true;
-                rules
-            });
+    let result = values_input.lines().fold(0, |mut result, line| {
+        let mut page_order = parse_pages_line(line);
 
-    let result = parts.next().unwrap().lines().fold(0, |mut result, line| {
-        let mut values: Vec<i32> = line
-            .split(',')
-            .map(|val| val.trim().parse().unwrap())
-            .collect();
-
-        if adheres_to_rules(&values, &ordering_rules) {
+        if adheres_to_rules(&page_order, &ordering_rules) {
             return result;
         }
 
-        values.sort_by(|&a, &b| {
+        page_order.sort_by(|&a, &b| {
             if ordering_rules[a as usize][b as usize] {
                 std::cmp::Ordering::Less
             } else if ordering_rules[b as usize][a as usize] {
@@ -76,7 +74,7 @@ pub fn part_two(input: &str) -> Option<i32> {
             }
         });
 
-        result += values.get(values.len() / 2).unwrap();
+        result += page_order.get(page_order.len() / 2).unwrap();
         result
     });
 
