@@ -1,3 +1,5 @@
+use advent_of_code::out_of_bounds;
+
 advent_of_code::solution!(4);
 
 type Point<T = i32> = (T, T);
@@ -15,10 +17,6 @@ const DIRECTIONS: [Point; 8] = [
     NORTH, SOUTH, EAST, WEST, NORTH_EAST, SOUTH_EAST, NORTH_WEST, SOUTH_WEST,
 ];
 
-fn out_of_bounds<T>(y: usize, x: usize, matrix: &[Vec<T>]) -> bool {
-    y == 0 || x == 0 || y > matrix.len() || x > matrix[0].len()
-}
-
 fn search(
     (x, y): Point<usize>,
     matrix: &[Vec<u8>],
@@ -32,7 +30,9 @@ fn search(
     }
 
     // Boundary checks and value match check
-    if out_of_bounds(y, x, matrix) || matrix[y - 1][x - 1] != search_term[depth] {
+    if out_of_bounds(y as i32 - 1, x as i32 - 1, matrix)
+        || matrix[y - 1][x - 1] != search_term[depth]
+    {
         return false;
     }
 
